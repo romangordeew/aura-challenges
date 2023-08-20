@@ -10,7 +10,7 @@ Straightforward frontend challenge for a blockchain-verified to-do list.
 
 ### Contract
 
-- `Todo.sol` is deployed on [Sepolia testnet](https://sepolia.etherscan.io/address/0x9898bd44b096cded357766f3c0803b5a8a8c8dd4).
+- `Todo.sol` is deployed on [Sepolia testnet](https://sepolia.etherscan.io/address/0xb03a1dd84d6d761de226CfaCf2a309F674c7ee87).
 - Feel free to use this deployment, or redeploy the contract using [Remix](https://remix.ethereum.org/) or another tool.
 - You can get Sepolia ETH with [Infura](https://www.infura.io/faucet/sepolia) or [other faucets](https://faucetlink.to/sepolia).
 

@@ -13,8 +13,8 @@ contract Todo {
 
     mapping(address => Item[]) public items;
 
-    function getCount() public view returns (uint256) {
-        return items[msg.sender].length;
+    function getCount(address _address) public view returns (uint256) {
+        return items[_address].length;
     }
 
     function create(string memory _text) public {
