@@ -1,5 +1,5 @@
 import React from "react";
-import { CircularProgress, Stack, Typography } from "@mui/material";
+import { CircularProgress, Stack, styled, Typography } from "@mui/material";
 import { useLoadTasks } from "../../hooks/use-load-tasks";
 import TasksList from "../tasks-list/tasks-list";
 import { useAccount } from "wagmi";
@@ -15,26 +15,21 @@ const TodoListContent = () => {
   return (
     <Stack>
       {isLoading ? (
-        <Stack
-          width="100%"
-          height={250}
-          alignItems="center"
-          justifyContent="center"
-        >
+        <ProgressStack>
           <CircularProgress />
-        </Stack>
+        </ProgressStack>
       ) : account.isConnected ? (
         <Stack>
-          <Typography mt={2} mb={1} fontSize={22}>
-            To do:
-          </Typography>
+          <TodoListHeader>To do:</TodoListHeader>
           <TasksList tasks={tasks.todo} />
           <AddTask />
 
-          <Typography mt={2} mb={1} fontSize={22}>
-            Completed:
-          </Typography>
-          <TasksList tasks={tasks.completed} />
+          {!!tasks.completed?.length && (
+            <>
+              <TodoListHeader>Completed:</TodoListHeader>
+              <TasksList tasks={tasks.completed} />
+            </>
+          )}
         </Stack>
       ) : (
         <></>
@@ -44,3 +39,16 @@ const TodoListContent = () => {
 };
 
 export default TodoListContent;
+
+const TodoListHeader = styled(Typography)({
+  marginTop: 16,
+  marginBottom: 8,
+  fontSize: 22,
+});
+
+const ProgressStack = styled(Stack)({
+  width: "100%",
+  height: 250,
+  alignItems: "center",
+  justifyContent: "center",
+});

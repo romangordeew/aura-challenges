@@ -1,10 +1,8 @@
-import React, { useEffect } from "react";
+import React from "react";
 import LoadingButton from "@mui/lab/LoadingButton";
-import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
-import { useLoadTasks } from "../../hooks/use-load-tasks";
 import { CONTRACT_ADDRESS } from "../../utils/constant";
 import { abi } from "../../assets/abis/todo-list-abi";
-import { useTransactionsSnackbar } from "../../hooks/use-transactions-snackbar";
+import { useWriteTodoContract } from "../../hooks/use-write-todo-contract";
 
 type TaskStatusButtonProps = {
   id: number | undefined;
@@ -12,19 +10,9 @@ type TaskStatusButtonProps = {
 };
 
 const TaskStatusButton = ({ id, isCompleted }: TaskStatusButtonProps) => {
-  const { data: hash, writeContract, isPending, error } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } =
-    useWaitForTransactionReceipt({
-      hash,
-    });
-
-  const { refetchContractGetsItems } = useLoadTasks();
-
-  useEffect(() => {
-    if (isConfirmed) {
-      refetchContractGetsItems();
-    }
-  }, [isConfirmed]);
+  const { writeContract, isFetching } = useWriteTodoContract({
+    refetchList: true,
+  });
 
   const onTaskStatusChange = () => {
     if (id !== undefined) {
@@ -37,11 +25,9 @@ const TaskStatusButton = ({ id, isCompleted }: TaskStatusButtonProps) => {
     }
   };
 
-  useTransactionsSnackbar({ hash, error, isConfirming });
-
   return (
     <LoadingButton
-      loading={isPending || isConfirming}
+      loading={isFetching}
       onClick={() => onTaskStatusChange()}
       variant="contained"
       size="small"

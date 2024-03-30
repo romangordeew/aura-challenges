@@ -1,13 +1,11 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Stack, TextField } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
-import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
-import { useLoadTasks } from "../../hooks/use-load-tasks";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { CONTRACT_ADDRESS } from "../../utils/constant";
 import { abi } from "../../assets/abis/todo-list-abi";
-import { useTransactionsSnackbar } from "../../hooks/use-transactions-snackbar";
 import { Task } from "../../types/types";
+import { useWriteTodoContract } from "../../hooks/use-write-todo-contract";
 
 type EditTaskFormFields = {
   taskName: string;
@@ -19,19 +17,14 @@ type EditTaskFormProps = {
 };
 
 const EditTaskForm = ({ task, setIsEditing }: EditTaskFormProps) => {
-  const { data: hash, writeContract, isPending, error } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } =
-    useWaitForTransactionReceipt({
-      hash,
-    });
-  const { refetchContractGetsItems: refetchTasksList } = useLoadTasks();
+  const onConfirm = () => {
+    setIsEditing(false);
+  };
 
-  useEffect(() => {
-    if (isConfirmed) {
-      refetchTasksList();
-      setIsEditing(false);
-    }
-  }, [isConfirmed]);
+  const { writeContract, isFetching } = useWriteTodoContract({
+    refetchList: true,
+    onConfirm,
+  });
 
   const {
     register,
@@ -50,7 +43,6 @@ const EditTaskForm = ({ task, setIsEditing }: EditTaskFormProps) => {
     }
   };
 
-  useTransactionsSnackbar({ hash, error, isConfirming });
   return (
     <form style={{ width: "100%" }} onSubmit={handleSubmit(onSubmit)}>
       <Stack gap={1} direction="row" justifyContent="space-between">
@@ -65,7 +57,7 @@ const EditTaskForm = ({ task, setIsEditing }: EditTaskFormProps) => {
           helperText={errors.taskName ? "This field is required" : ""}
         />
         <LoadingButton
-          loading={isPending || isConfirming}
+          loading={isFetching}
           variant="contained"
           type="submit"
           size="small"
@@ -76,7 +68,7 @@ const EditTaskForm = ({ task, setIsEditing }: EditTaskFormProps) => {
         <LoadingButton
           sx={{ height: 30 }}
           size="small"
-          disabled={isPending || isConfirming}
+          disabled={isFetching}
           variant="contained"
           onClick={() => setIsEditing(false)}
         >

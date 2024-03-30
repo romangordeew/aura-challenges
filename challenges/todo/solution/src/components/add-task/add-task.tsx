@@ -1,12 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { Stack, TextField } from "@mui/material";
+import React, { useState } from "react";
+import { Stack, styled, TextField } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
-import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { CONTRACT_ADDRESS } from "../../utils/constant";
 import { abi } from "../../assets/abis/todo-list-abi";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { useLoadTasks } from "../../hooks/use-load-tasks";
-import { useTransactionsSnackbar } from "../../hooks/use-transactions-snackbar";
+import { useWriteTodoContract } from "../../hooks/use-write-todo-contract";
 
 type AddTaskForm = {
   taskName: string;
@@ -15,19 +13,9 @@ type AddTaskForm = {
 const AddTask = () => {
   const [showForm, setShowForm] = useState(false);
 
-  const { refetchContractGetCount: refetchTasksList } = useLoadTasks();
-
-  const { data: hash, writeContract, isPending, error } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } =
-    useWaitForTransactionReceipt({
-      hash,
-    });
-
-  useEffect(() => {
-    if (isConfirmed) {
-      refetchTasksList();
-    }
-  }, [isConfirmed]);
+  const { writeContract, isFetching } = useWriteTodoContract({
+    refetchCount: true,
+  });
 
   const {
     register,
@@ -44,10 +32,8 @@ const AddTask = () => {
     });
   };
 
-  useTransactionsSnackbar({ hash, error, isConfirming });
-
   return (
-    <Stack direction="row" justifyContent="flex-end" mt={1} gap={1}>
+    <StyledAddTask>
       {showForm && (
         <form onSubmit={handleSubmit(onSubmit)} style={{ width: "100%" }}>
           <Stack gap={1} direction="row">
@@ -62,7 +48,7 @@ const AddTask = () => {
             />
             <LoadingButton
               sx={{ height: 30 }}
-              loading={isPending || isConfirming}
+              loading={isFetching}
               variant="contained"
               type="submit"
               size="small"
@@ -76,12 +62,20 @@ const AddTask = () => {
         sx={{ height: 30 }}
         size="small"
         variant="contained"
+        disabled={isFetching}
         onClick={() => setShowForm(!showForm)}
       >
         {showForm ? "-" : "+"}
       </LoadingButton>
-    </Stack>
+    </StyledAddTask>
   );
 };
 
 export default AddTask;
+
+const StyledAddTask = styled(Stack)({
+  flexDirection: "row",
+  justifyContent: "flex-end",
+  marginTop: 8,
+  gap: 8,
+});
