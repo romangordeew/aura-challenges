@@ -1,4 +1,4 @@
-import { Stack, styled, Typography } from "@mui/material";
+import { Stack, styled, Tooltip, Typography } from "@mui/material";
 import React, { useState } from "react";
 import { Task } from "../../types/types";
 import TaskStatusButton from "./task-status-button";
@@ -17,7 +17,12 @@ const TaskItem = ({ task }: TaskProps) => {
         <EditTaskForm task={task} setIsEditing={setIsEditing} />
       ) : (
         <>
-          <StyledTaskTitle>{task.title}</StyledTaskTitle>
+          <Tooltip title="Double click to edit">
+            <Stack width="100%">
+              <StyledTaskTitle>{task.title}</StyledTaskTitle>
+            </Stack>
+          </Tooltip>
+
           <TaskStatusButton isCompleted={task.isCompleted} id={task.id} />
         </>
       )}
@@ -34,6 +39,7 @@ const StyledTaskItem = styled(Stack)({
   borderBottom: "1px solid #334155",
   paddingTop: 4,
   paddingBottom: 3,
+  cursor: "pointer",
 });
 
 const StyledTaskTitle = styled(Typography)(({ theme }) => ({
